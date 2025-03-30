@@ -2,11 +2,12 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  user: 'postgres',       // 替换为你的数据库用户名
-  host: 'localhost',
-  database: 'restaurant',   // 替换为你的数据库名
-  password: 'COCOatbimh0130!',   // 替换为你的数据库密码
+  user: process.env.DB_HOST,       // 替换为你的数据库用户名
+  host: process.env.DB_PORT,
+  database: process.env.DB_USER,   // 替换为你的数据库名
+  password: process.env.DB_PASSWORD,   // 替换为你的数据库密码
   port: 5432,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
 });
 
 const queryDB = async (text, params) => {
