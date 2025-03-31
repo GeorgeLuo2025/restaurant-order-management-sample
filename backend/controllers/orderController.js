@@ -2,35 +2,48 @@
 const { pool, queryDB } = require('../config/db');
 
 // 顾客下单（创建订单及订单详情，使用事务保证数据一致性）
+const db = require('../config/db');
+
 exports.createOrder = async (req, res) => {
-  const { user_id, items } = req.body; // items 为数组，每个元素包含 { menu_item_id, quantity }
-  if (!user_id || !Array.isArray(items) || items.length === 0) {
-    return res.status(400).json({ error: '订单数据不完整' });
-  }
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
-    // 创建订单
-    const orderResult = await client.query(
-      'INSERT INTO orders (user_id) VALUES ($1) RETURNING *',
-      [user_id]
-    );
-    const order = orderResult.rows[0];
-    // 创建订单详情
-    for (const item of items) {
-      await client.query(
-        'INSERT INTO order_items (order_id, menu_item_id, quantity) VALUES ($1, $2, $3)',
-        [order.id, item.menu_item_id, item.quantity || 1]
-      );
+    // 从请求体中获取顾客姓名和订单项信息
+    const { customer_name, items } = req.body;
+    if (!customer_name || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: "顾客姓名和订单菜品必填" });
     }
-    await client.query('COMMIT');
-    res.status(201).json({ order_id: order.id });
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error(err);
-    res.status(500).json({ error: '下单失败' });
-  } finally {
-    client.release();
+
+    // 开启事务，确保订单和详情一致性
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // 插入订单记录，customer_name 字段记录顾客姓名，status 默认 'pending'
+      const orderResult = await client.query(
+        'INSERT INTO orders (customer_name, overall_status) VALUES ($1, $2) RETURNING id',
+        [customer_name, 'pending']
+      );
+      const orderId = orderResult.rows[0].id;
+
+      // 插入订单详情，每个订单项状态默认 'pending'
+      for (const item of items) {
+        await client.query(
+          'INSERT INTO order_items (order_id, menu_item_id, quantity, status) VALUES ($1, $2, $3, $4)',
+          [orderId, item.menu_item_id, item.quantity || 1, 'pending']
+        );
+      }
+
+      await client.query('COMMIT');
+      res.status(201).json({ message: "订单创建成功", orderId });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error("事务处理失败：", err);
+      res.status(500).json({ error: "订单创建失败" });
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error("创建订单错误:", error);
+    res.status(500).json({ error: "创建订单失败" });
   }
 };
 
