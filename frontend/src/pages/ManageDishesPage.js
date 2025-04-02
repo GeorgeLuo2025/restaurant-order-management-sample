@@ -19,15 +19,24 @@ function ManageDishesPage() {
       body: JSON.stringify(newDish),
     })
       .then(res => res.json())
-      .then(data => {
-        setDishes([...dishes, data]);
-        setNewDish({ name: '', price: '' }); // 添加后重置输入框
-      });
+      .then(data => setDishes([...dishes, data]));
   };
 
   const handleDeleteDish = (id) => {
     fetch(`/api/menu/${id}`, { method: 'DELETE' })
       .then(() => setDishes(dishes.filter(dish => dish.id !== id)));
+  };
+
+  const handleUpdateDish = (id, updatedFields) => {
+    fetch(`/api/menu/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedFields),
+    })
+      .then(res => res.json())
+      .then(updated => {
+        setDishes(dishes.map(dish => (dish.id === id ? updated : dish)));
+      });
   };
 
   return (
@@ -39,6 +48,7 @@ function ManageDishesPage() {
             <th>ID</th>
             <th>名称</th>
             <th>价格</th>
+            <th>是否上架</th>
             <th>操作</th>
           </tr>
         </thead>
@@ -46,8 +56,27 @@ function ManageDishesPage() {
           {dishes.map(dish => (
             <tr key={dish.id}>
               <td>{dish.id}</td>
-              <td>{dish.name}</td>
-              <td>{dish.price}</td>
+              <td>
+                <Form.Control
+                  type="text"
+                  defaultValue={dish.name}
+                  onBlur={(e) => handleUpdateDish(dish.id, { name: e.target.value })}
+                />
+              </td>
+              <td>
+                <Form.Control
+                  type="number"
+                  defaultValue={dish.price}
+                  onBlur={(e) => handleUpdateDish(dish.id, { price: parseFloat(e.target.value) })}
+                />
+              </td>
+              <td>
+                <Form.Check
+                  type="checkbox"
+                  checked={dish.is_available}
+                  onChange={(e) => handleUpdateDish(dish.id, { is_available: e.target.checked })}
+                />
+              </td>
               <td>
                 <Button variant="danger" onClick={() => handleDeleteDish(dish.id)}>删除</Button>
               </td>
@@ -55,26 +84,19 @@ function ManageDishesPage() {
           ))}
         </tbody>
       </Table>
-      <Form className="mt-4">
-        <Form.Group className="mb-3" controlId="dishName">
+      <Form>
+        <Form.Group>
           <Form.Label>名称</Form.Label>
-          <Form.Control 
-            type="text" 
-            placeholder="请输入菜品名称" 
-            value={newDish.name} 
-            onChange={(e) => setNewDish({ ...newDish, name: e.target.value })} 
-          />
+          <Form.Control type="text" onChange={(e) => setNewDish({ ...newDish, name: e.target.value })} />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="dishPrice">
+        <Form.Group>
           <Form.Label>价格</Form.Label>
-          <Form.Control 
-            type="number" 
-            placeholder="请输入菜品价格" 
-            value={newDish.price} 
-            onChange={(e) => setNewDish({ ...newDish, price: e.target.value })} 
-          />
+          <Form.Control type="number" onChange={(e) => setNewDish({ ...newDish, price: e.target.value })} />
         </Form.Group>
-        <Button variant="primary" onClick={handleAddDish}>添加菜品</Button>
+        <Form.Group>
+          <Form.Check type="checkbox" label="是否上架" checked={newDish.is_available} onChange={(e) => setNewDish({ ...newDish, is_available: e.target.checked })} />
+        </Form.Group>
+        <Button onClick={handleAddDish}>添加菜品</Button>
       </Form>
     </div>
   );
