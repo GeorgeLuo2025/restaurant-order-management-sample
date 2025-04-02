@@ -30,7 +30,7 @@ exports.updateMenuItem = async (req, res) => {
   const { name, description, price, is_available } = req.body;
   if (name && price !== undefined) {
     try {
-      const updateItem = await MenuItem.update({ id, name, description, price, is_available });
+      const updateItem = await MenuItem.update({ id: menuItemId, name, description, price, is_available });
       res.status(201).json(updateItem);
     } catch (error) {
       res.status(500).json({ error: '更改菜单项失败' });
@@ -41,7 +41,7 @@ exports.updateMenuItem = async (req, res) => {
 exports.deleteMenuItem = async (req, res) => {
   const menuItemId = req.params.id;
   try {
-    const deleteItem = await MenuItem.delete({id});
+    const deleteItem = await MenuItem.delete({id : menuItemId});
     res.status(201).json(deleteItem);
   } catch (error) {
     res.status(500).json({error: '删除菜单项失败'});
