@@ -3,9 +3,9 @@ import { Card, Button } from 'react-bootstrap';
 
 function MenuPage() {
   const [dishes, setDishes] = useState([]);
-  
+
   useEffect(() => {
-    fetch('/api/dishes')
+    fetch('/api/menu')
       .then(res => res.json())
       .then(data => setDishes(data));
   }, []);
