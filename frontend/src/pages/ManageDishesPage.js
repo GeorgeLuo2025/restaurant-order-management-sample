@@ -9,7 +9,9 @@ function ManageDishesPage() {
   useEffect(() => {
     fetch('/api/menu')
       .then(res => res.json())
-      .then(data => setDishes(data));
+      .then(data => {setDishes(data)
+    });
+      
   }, []);
 
   const handleAddDish = () => {
@@ -27,15 +29,17 @@ function ManageDishesPage() {
       .then(() => setDishes(dishes.filter(dish => dish.id !== id)));
   };
 
-  const handleUpdateDish = (id, updatedFields) => {
-    fetch(`/api/menu/${id}`, {
+  const handleUpdateDish = (updatedFields) => {
+    const updateId = updatedFields.id;
+    const updateFactor = {name : updatedFields.name, description : updatedFields.description, price : updatedFields.price, is_available : updatedFields.is_available}
+    fetch(`/api/menu/${updateId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedFields),
+      body: JSON.stringify(updateFactor),
     })
       .then(res => res.json())
       .then(updated => {
-        setDishes(dishes.map(dish => (dish.id === id ? updated : dish)));
+        setDishes(dishes.map(dish => (dish.id === updateId ? updated : dish)));
       });
   };
 
@@ -48,6 +52,7 @@ function ManageDishesPage() {
             <th>ID</th>
             <th>名称</th>
             <th>价格</th>
+            <th>描述</th>
             <th>是否上架</th>
             <th>操作</th>
           </tr>
@@ -59,22 +64,42 @@ function ManageDishesPage() {
               <td>
                 <Form.Control
                   type="text"
-                  defaultValue={dish.name}
-                  onBlur={(e) => handleUpdateDish(dish.id, { name: e.target.value })}
+                  value={dish.name}
+                  onChange={(e) => {
+                    // const updatedDishes = 
+                    setDishes(dishes.map(d =>
+                        d.id === dish.id ? { ...d, name: e.target.value } : d
+                      ));
+                  }}
+                  onBlur={(e) => { 
+                        if (e.target.value.trim() !== '') {
+                            handleUpdateDish({...dish, name: e.target.value })
+                        } else {
+                            setDishes(dishes);
+                        }
+                    }
+                  }
                 />
               </td>
               <td>
                 <Form.Control
                   type="number"
                   defaultValue={dish.price}
-                  onBlur={(e) => handleUpdateDish(dish.id, { price: parseFloat(e.target.value) })}
+                  onBlur={(e) => handleUpdateDish({...dish, price: parseFloat(e.target.value) })}
+                />
+              </td>
+              <td>
+                <Form.Control
+                  type="text"
+                  defaultValue={dish.description}
+                  onBlur={(e) => handleUpdateDish({...dish, description: e.target.value })}
                 />
               </td>
               <td>
                 <Form.Check
                   type="checkbox"
                   checked={dish.is_available}
-                  onChange={(e) => handleUpdateDish(dish.id, { is_available: e.target.checked })}
+                  onChange={(e) => handleUpdateDish({...dish, is_available: e.target.checked })}
                 />
               </td>
               <td>
@@ -92,6 +117,10 @@ function ManageDishesPage() {
         <Form.Group>
           <Form.Label>价格</Form.Label>
           <Form.Control type="number" onChange={(e) => setNewDish({ ...newDish, price: e.target.value })} />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>描述</Form.Label>
+          <Form.Control type="text" onChange={(e) => setNewDish({ ...newDish, description: e.target.value })} />
         </Form.Group>
         <Form.Group>
           <Form.Check type="checkbox" label="是否上架" checked={newDish.is_available} onChange={(e) => setNewDish({ ...newDish, is_available: e.target.checked })} />
