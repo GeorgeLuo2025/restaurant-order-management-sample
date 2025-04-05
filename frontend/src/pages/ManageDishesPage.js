@@ -4,6 +4,7 @@ import { Table, Button, Form } from 'react-bootstrap';
 function ManageDishesPage() {
   const [dishes, setDishes] = useState([]);
   const [newDish, setNewDish] = useState({ name: '', price: '' });
+ 
 
   // 从后端接口 /api/menu 获取菜品数据
   useEffect(() => {

@@ -1,5 +1,5 @@
 // Cart.jsx
-function Cart({ items, onUpdateQuantity, total }) {
+function Cart({ items, onUpdateQuantity, total, customerName, onCustomerNameChange, onOrderSubmission}) {
     return (
       <>
         {items.length === 0 ? (
@@ -41,11 +41,24 @@ function Cart({ items, onUpdateQuantity, total }) {
               </div>
             ))}
             <hr />
+
+            <div className="mb-3">
+              <label htmlFor="customerName" className="form-label">顾客姓名</label>
+              <input
+                type="text"
+                className="form-control"
+                id="customerName"
+                placeholder="请输入您的姓名"
+                value={customerName}
+                onChange={(e) => onCustomerNameChange(e.target.value)}
+              />
+            </div>
+
             <div className="d-flex justify-content-between fw-bold">
               <span>总计：</span>
               <span>¥{total.toFixed(2)}</span>
             </div>
-            <button className="btn btn-success w-100 mt-3">
+            <button className="btn btn-success w-100 mt-3" onClick={(() => onOrderSubmission())}>
               提交订单
             </button>
           </>
