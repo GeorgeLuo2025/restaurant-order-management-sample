@@ -1,5 +1,18 @@
 // Cart.jsx
-function Cart({ items, onUpdateQuantity, total, customerName, onCustomerNameChange, onOrderSubmission}) {
+function Cart({ items, onUpdateQuantity, total, customerName, onCustomerNameChange, onOrderSubmission, isSubmitting}) {
+
+    const handleSubmit = () => {
+      if (items.length === 0) {
+        alert('购物车为空，无法提交');
+        return;
+      }
+      if (!customerName) {
+        alert('请输入顾客姓名');
+        return;
+      }
+      onOrderSubmission(customerName, items); // 传递参数
+    };
+
     return (
       <>
         {items.length === 0 ? (
@@ -58,8 +71,8 @@ function Cart({ items, onUpdateQuantity, total, customerName, onCustomerNameChan
               <span>总计：</span>
               <span>¥{total.toFixed(2)}</span>
             </div>
-            <button className="btn btn-success w-100 mt-3" onClick={(() => onOrderSubmission())}>
-              提交订单
+            <button className="btn btn-success w-100 mt-3" onClick={(handleSubmit)} disabled={isSubmitting}>
+              {isSubmitting ? '提交中...' : '提交订单'}
             </button>
           </>
         )}
