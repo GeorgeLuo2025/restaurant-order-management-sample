@@ -1,0 +1,46 @@
+.order-card {
+    transition: background-color 0.3s ease;
+    border-left: 6px solid transparent;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+  }
+  
+  /* 各状态颜色卡片背景 + 左边条 */
+  .status-pending {
+    background-color: #fff3cd;
+    border-left-color: #ffc107;
+  }
+  
+  .status-ready {
+    background-color: #d4edda;
+    border-left-color: #28a745;
+  }
+  
+  .status-served {
+    background-color: #e2e3e5;
+    border-left-color: #6c757d;
+  }
+  
+  /* 状态 Badge 样式 */
+  .badge.status-pending {
+    background-color: #ffc107;
+    color: #212529;
+    padding: 3px 6px;
+    border-radius: 4px;
+  }
+  
+  .badge.status-ready {
+    background-color: #28a745;
+    color: white;
+    padding: 3px 6px;
+    border-radius: 4px;
+  }
+  
+  .badge.status-served {
+    background-color: #6c757d;
+    color: white;
+    padding: 3px 6px;
+    border-radius: 4px;
+  }
+  

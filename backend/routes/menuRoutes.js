@@ -5,6 +5,8 @@ const menuController = require('../controllers/menuController');
 
 // 获取所有菜单项
 router.get('/', menuController.getAllMenuItems);
+
+router.get('/:id', menuController.getOneMenuItems);
 // 新增菜单项
 router.post('/', menuController.createMenuItem);
 

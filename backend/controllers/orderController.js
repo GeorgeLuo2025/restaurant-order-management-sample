@@ -51,7 +51,7 @@ exports.createOrder = async (req, res) => {
 exports.getAllOrders = async (req, res) => {
   try {
     const result = await queryDB(
-      `SELECT o.id as order_id, o.order_time, oi.id as order_item_id, oi.menu_item_id, oi.quantity, oi.status
+      `SELECT o.id as order_id, o.order_time, o.customer_name, oi.id as order_item_id, oi.menu_item_id, oi.quantity, oi.status
        FROM orders o
        JOIN order_items oi ON o.id = oi.order_id
        ORDER BY o.order_time ASC`,
@@ -62,6 +62,8 @@ exports.getAllOrders = async (req, res) => {
     res.status(500).json({ error: '获取订单失败' });
   }
 };
+
+
 
 // 厨房更新订单项状态（如 'preparing'、'ready'）
 exports.updateOrderItemStatus = async (req, res) => {
@@ -100,6 +102,7 @@ exports.getOrdersForWaiter = async (req, res) => {
     res.status(500).json({ error: '获取待上菜订单项失败' });
   }
 };
+
 
 // 服务员更新订单项状态为 'served'（已上菜）
 exports.serveOrderItem = async (req, res) => {

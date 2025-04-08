@@ -6,6 +6,11 @@ exports.getAll = async () => {
   return result.rows;
 };
 
+exports.getOne = async ({menu_item_id}) => {
+  const result = await queryDB('SELECT * FROM menu_items Where id = $1', [menu_item_id]);
+  return result.rows[0];
+};
+
 exports.create = async ({ name, description, price, is_available }) => {
   const result = await queryDB(
     'INSERT INTO menu_items (name, description, price, is_available) VALUES ($1, $2, $3, $4) RETURNING *',

@@ -19,3 +19,16 @@ exports.getAllOrders = async () => {
   );
   return result.rows;
 };
+
+
+// exports.getAllOrdersReady = async () => {
+//   const result = await queryDB(
+//     `SELECT o.id as order_id, o.order_time, oi.id as order_item_id, oi.menu_item_id, oi.quantity, oi.status
+//      FROM orders o
+//      JOIN order_items oi ON o.id = oi.order_id
+//      WHERE oi.status = 'ready'
+//      ORDER BY o.order_time ASC`,
+//     []
+//   );
+//   return result.rows;
+// };

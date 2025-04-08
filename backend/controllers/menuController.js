@@ -11,6 +11,16 @@ exports.getAllMenuItems = async (req, res) => {
   }
 };
 
+exports.getOneMenuItems = async (req, res) => {
+  const menuItemId = req.params.id;
+  try {
+    const item = await MenuItem.getOne({menu_item_id : menuItemId});
+    res.json(item);
+  } catch (error) {
+    res.status(500).json({error: '获取菜单单品失败'});
+  }
+}
+
 // 新增菜单项（厨房/管理员使用）
 exports.createMenuItem = async (req, res) => {
   const { name, description, price, is_available } = req.body;
