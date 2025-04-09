@@ -6,25 +6,46 @@ function WaiterOrdersPage() {
 
   // 页面加载：获取所有 ready 状态订单项（或由后端过滤）
   useEffect(() => {
-    fetch('/api/orders?status=ready')
+    fetch('/api/orders/waiter')
       .then(res => res.json())
-      .then(data => setOrders(data))
+      .then(data => fetchOrdersWithMenuNames(data))
+      .then(results => setOrders(results))
       .catch(err => console.error('获取订单失败:', err));
   }, []);
 
+  const fetchOrdersWithMenuNames = async (orders) => {
+    const results = await Promise.all(
+      orders.map(async (order) => {
+        const res = await fetch(`/api/menu/${order.menu_item_id}`);
+        if (!res.ok) {
+          return {
+            ...order,
+            item_name: "未知菜品",
+            item_is_available: false
+          };
+        }
+
+        const menuItem = await res.json();
+        return {
+          ...order,
+          item_name: menuItem.name,
+          item_is_available: menuItem.is_available
+        };
+      })
+    );
+    return results;
+  };
+
   // 更新状态为 served
   const handleStatusUpdate = (orderItemId) => {
-    fetch(`/orderItems/${orderItemId}/serve`, {
+    fetch(`/api/orders/orderItems/${orderItemId}/serve`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'served' }),
+      headers: { 'Content-Type': 'application/json' }
+      // body: JSON.stringify({ status: 'served' }),
     })
       .then(res => res.json())
       .then(updated => {
-        // 更新本地状态
-        setOrders(orders.map(order =>
-          order.order_item_id === orderItemId ? { ...order, status: 'served' } : order
-        ));
+        setOrders(orders.map(order => (order.order_item_id === orderItemId ? {...order, status : updated.status} : order)));
       })
       .catch(err => console.error('更新失败:', err));
   };
